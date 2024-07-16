@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  purchases Purchase[]
+
+  @@map("user")
+}
+
+model Purchase {
+  id                   Int                @id @default(autoincrement())
+  userId               Int                @map("user_id")
+  user                 User               @relation(fields: [userId], references: [id])
+  paymentTransactionId Int                @map("payment_transaction_id")
+  paymentTransaction   PaymentTransaction @relation(fields: [paymentTransactionId], references: [id])
+  purchasedAt          DateTime           @map("purchased_at") // 購入日時
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  @@map("purchase")
+}
+
+model PaymentTransaction {
+  id            Int        @id @default(autoincrement())
+  amount        Int        @map("amount")
+  orderId       String     @unique @map("order_id") // fincode order id
+  accessId      String     @unique @map("access_id") // fincode access id
+  status        String     @map("status") // fincode status(UNPROCESSED, AUTHENTICATED, CHECKED, AUTHORIZED, CAPTURED, CANCELED)
+  paymentMethod String     @map("payment_method") // 決済方法(Card)
+  capturedAt    DateTime   @map("captured_at") // 決済確定日時
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  purchases     Purchase[]
+
+  @@map("payment_transaction")
+}

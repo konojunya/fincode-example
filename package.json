@@ -1,0 +1,19 @@
+{
+  "name": "fincode-example",
+  "scripts": {
+    "dev": "tsx watch server.ts"
+  },
+  "dependencies": {
+    "@fincode/js": "^1.0.0",
+    "@fincode/node": "^1.0.2",
+    "@hono/node-server": "^1.12.0",
+    "@prisma/client": "^5.16.2",
+    "hono": "^4.4.13",
+    "prisma": "^5.16.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "prettier": "^3.3.3",
+    "tsx": "^4.16.2"
+  }
+}
