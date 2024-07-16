@@ -24,19 +24,17 @@ app.get("/", (c) => {
 // クレジットカード決済
 app.post("/api/payment/card", async (c) => {
   try {
-    const uuid = randomUUID().split("-").join("").slice(0, 30);
     const body: { token: string } = await c.req.json();
     console.log({ body });
 
     const payment = await fincode.payments.create({
-      id: uuid,
       pay_type: "Card",
       job_code: "CAPTURE",
       amount: "1000",
     });
     console.log({ payment });
 
-    const result = await fincode.payments.execute(uuid, {
+    const result = await fincode.payments.execute(payment.id, {
       pay_type: "Card",
       method: "1",
       access_id: payment.access_id,
@@ -47,7 +45,7 @@ app.post("/api/payment/card", async (c) => {
     const paymentTransaction = await prisma.paymentTransaction.create({
       data: {
         amount: 1000,
-        orderId: uuid,
+        orderId: payment.id,
         accessId: result.access_id,
         status: result.status,
         paymentMethod: "Card",
