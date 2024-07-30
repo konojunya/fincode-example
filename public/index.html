@@ -28,7 +28,22 @@
         セキュリティコード
         <input id="card-cvv" value="123" />
       </label>
-      <button type="button" id="credit-card-form-submit">決済する</button>
+      <button type="button" id="credit-card-create-submit">カード登録する</button>
+
+      <div>
+        <button type="button" id="3ds-success">3DS認証成功</button>
+        <button type="button" id="3ds-failed">3DS認証失敗</button>
+        <button type="button" id="3ds-challenge">チャレンジ要求</button>
+      </div>
+
+      <div>
+        <label>カードID
+          <input id="card-id" />
+        </label>
+
+        <button type="button" id="fetch-credit-card-list">決済手段一覧取得</button>
+        <button type="button" id="credit-card-purchase-submit">決済する</button>
+      </div>
     </form>
 
     <script defer src="public/index.js"></script>

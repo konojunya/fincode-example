@@ -1,10 +1,35 @@
 const FINCODE_PUBLIC_KEY =
-  "p_test_OWY4ZjY3MTctMmQ3YS00ZjU2LThlNjAtMDFlOTg5NWU1NmIzYzY0YWRjMzMtNmVhNy00NjQ5LWFmMzEtZjllNDEwOTI3YzI0c18yNDA3MTU4Mjk4NA";
+  "p_test_NjVjYzc1YzAtZTg3MC00YjEyLWFmNzctOTNlOWY1YjFiM2IyMjNmNzNmNjQtZTY3Mi00MjIyLTgzMDMtZDUwZTg1ZmI0OTEyc18yNDA3MjYyMDg3MA";
 
 const fincode = Fincode(FINCODE_PUBLIC_KEY);
 
-const creditCardFormButton = document.getElementById("credit-card-form-submit");
-function handleCreditCardPurchase() {
+const creditCardCreateFormButton = document.getElementById(
+  "credit-card-create-submit",
+);
+const cardNumberInput = document.getElementById("card-number");
+
+const creditCardPurchaseFormButton = document.getElementById(
+  "credit-card-purchase-submit",
+);
+const cardIdInput = document.getElementById("card-id");
+
+const fetchCreditCardList = document.getElementById("fetch-credit-card-list");
+
+const card3dsSuccessInputButton = document.getElementById("3ds-success");
+const card3dsFailedInputButton = document.getElementById("3ds-failed");
+const card3dsChallengeInputButton = document.getElementById("3ds-challenge");
+
+card3dsSuccessInputButton.addEventListener("click", () => {
+  cardNumberInput.value = "4100000000000100";
+});
+card3dsFailedInputButton.addEventListener("click", () => {
+  cardNumberInput.value = "4100000000200007";
+});
+card3dsChallengeInputButton.addEventListener("click", () => {
+  cardNumberInput.value = "4100000000005000";
+});
+
+function handleCreditCardCreate() {
   const cardNumber = document.getElementById("card-number");
   const cardExpiration = document.getElementById("card-expire");
   const cardCvv = document.getElementById("card-cvv");
@@ -17,7 +42,7 @@ function handleCreditCardPurchase() {
     },
     async (status, response) => {
       if (status !== 200) {
-        alert("決済に失敗しました");
+        alert("カード登録に失敗しました");
         return;
       }
 
@@ -37,12 +62,9 @@ function handleCreditCardPurchase() {
         body: JSON.stringify({ token }),
       });
 
-      if (result.status !== 200) {
-        alert("決済に失敗しました");
-        return;
-      }
+      const data = await result.json();
 
-      alert("決済が完了しました");
+      window.open(data.redirect_url, "_blank");
     },
     (error) => {
       console.error(error);
@@ -50,4 +72,34 @@ function handleCreditCardPurchase() {
   );
 }
 
-creditCardFormButton.addEventListener("click", handleCreditCardPurchase);
+async function handleCreditCardPurchase() {
+  const cardId = cardIdInput.value;
+
+  const response = await fetch("/api/payment/purchase", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ cardId }),
+  });
+
+  const result = await response.json();
+
+  console.log(result);
+}
+
+creditCardCreateFormButton.addEventListener("click", handleCreditCardCreate);
+creditCardPurchaseFormButton.addEventListener(
+  "click",
+  handleCreditCardPurchase,
+);
+
+fetchCreditCardList.addEventListener("click", async () => {
+  const result = await fetch("/api/payment/card", {
+    method: "GET",
+  });
+
+  const data = await result.json();
+
+  console.log(data);
+});
